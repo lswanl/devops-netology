@@ -46,9 +46,11 @@ root@Mytest:/home/ldywa# cat test
 123123123123123
 1231231231231231
 qwe
-
+111111
+new line
 root@Mytest:/home/ldywa# cat test_out
-cat: test_out: Нет такого файла или каталога
+root@Mytest:/home/ldywa# cat <tst >test_out
+bash: tst: Нет такого файла или каталога
 root@Mytest:/home/ldywa# cat <test >test_out
 root@Mytest:/home/ldywa# cat test_out
 123123
@@ -57,6 +59,8 @@ root@Mytest:/home/ldywa# cat test_out
 123123123123123
 1231231231231231
 qwe
+111111
+new line
 
 root@Mytest:/home/ldywa#
 
