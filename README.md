@@ -1,110 +1,71 @@
-1. Это команда встройенная, меняет указатель на текущую дерикторию внутренней функцией
-можно сделать CD внешней программой, но после смены деректории необходимо вызвать bash, но тогда мы получим новый shell.
+1. системный вызов команды CD -> chdir("/tmp")
 
-2.
-root@Mytest:/home/ldywa# cat test
-123123
-123123123
-123123123123
-123123123123123
-1231231231231231
-qwe
+2. [root@localhost devops-netology]# file /dev/tty
+/dev/tty: character special
+[root@localhost devops-netology]# file /dev/sda
+/dev/sda: block special
+[root@localhost devops-netology]# file /bin/bash
+/bin/bash: ELF 64-bit LSB executable, x86-64, version 1 (SYSV), dynamically linked (uses shared libs), for GNU/Linux 2.6.32
 
-root@Mytest:/home/ldywa# grep qwe test -c
-1
-root@Mytest:/home/ldywa# grep qwe test -c |wc -l
-1
+[root@localhost devops-netology]# strace file
+execve("/usr/bin/file", ["file"], 0x7ffe799be3e0 /* 25 vars */) = 0
+open("/usr/lib64/tls/x86_64/libmagic.so.1", O_RDONLY|O_CLOEXEC) = -1 
+stat("/usr/lib64/tls/x86_64", 0x7ffe18a09e20) = -1 ENOENT 
+open("/usr/lib64/tls/libmagic.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (
+stat("/usr/lib64/tls", {st_mode=S_IFDIR|0555, st_size=6, ...}) = 0
+open("/usr/lib64/x86_64/libmagic.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT 
+stat("/usr/lib64/x86_64", 0x7ffe18a09e20) = -1 ENOENT 
+open("/usr/lib64/libmagic.so.1", O_RDONLY|O_CLOEXEC) = 3
 
-3.  systemd
+3. [root@localhost devops-netology]# ps aux | grep nano
+root      1724  0.0  0.0 112832   972 pts/0    R+   16:28   0:00 grep --color=auto nano
 
-systemd(1)─┬─agetty(350)
-           ├─cron(327)
-           ├─dbus-daemon(331)
-           ├─dhclient(330)
-           ├─exim4(27447)
-           ├─rpc.idmapd(27127)
-           ├─rpc.mountd(27128)
-           ├─rpcbind(26516)
-           ├─rsyslogd(337)─┬─{rsyslogd}(342)
-           │               ├─{rsyslogd}(343)
-           │               └─{rsyslogd}(346)
-           ├─sshd(356)───sshd(19728)───sshd(19748)───bash(19749)───su(19752)───bash(19753)───pstree(19971)
-           ├─systemd(19732)───(sd-pam)(19733)
-           ├─systemd-journal(201)
-           ├─systemd-logind(336)
-           ├─systemd-timesyn(260)───{systemd-timesyn}(316)
-           └─systemd-udevd(218)
+[root@localhost devops-netology]# lsof -p 1724
 
+[root@localhost devops-netology]# echo '' >/proc/1724
 
-4. ls -l \root 2>/dev/pts/1
+4. Зомби" процессы освобождают свои ресурсы, но не освобождают запись в таблице процессов. Запись освободиться при вызове wait()
 
-5.
-root@Mytest:/home/ldywa# cat test
-123123
-123123123
-123123123123
-123123123123123
-1231231231231231
-qwe
-111111
-new line
-root@Mytest:/home/ldywa# cat test_out
-root@Mytest:/home/ldywa# cat <tst >test_out
-bash: tst: Нет такого файла или каталога
-root@Mytest:/home/ldywa# cat <test >test_out
-root@Mytest:/home/ldywa# cat test_out
-123123
-123123123
-123123123123
-123123123123123
-1231231231231231
-qwe
-111111
-new line
+5. [root@localhost devops-netology]#~sudo -i
+[root@localhost devops-netology]## dpkg -L bpfcc-tools | grep sbin/opensnoop
+/usr/sbin/opensnoop-bpfcc
+[root@localhost devops-netology]# /usr/sbin/opensnoop-bpfcc
+PID    COMM               FD ERR PATH
+766    vminfo              6   0 /var/run/utmp
+562    dbus-daemon        -1   2 /usr/local/share/dbus-1/system-services
+562    dbus-daemon        18   0 /usr/share/dbus-1/system-services
+562    dbus-daemon        -1   2 /lib/dbus-1/system-services
+562    dbus-daemon        18   0 /var/lib/snapd/dbus-1/system-services/
 
-root@Mytest:/home/ldywa#
+6.
+системный вызов uname()
+Part of the utsname information is also accessible  via  /proc/sys/ker‐
+       nel/{ostype, hostname, osrelease, version, domainname}.
+
+7.
+[root@localhost devops-netology]# test -d /tmp/some_dir; echo Hi
+Hi
+[root@localhost devops-netology]# test -d /tmp/some_dir && echo Hi
+[root@localhost devops-netology]#
 
 
-6.Вывести полуится при использовании перенаправлении вывода, но наблюдать в графическом режиме не получиться.
+&& -  условный оператор, 
+а ;  - разделитель последовательных команд
 
-7. 
-bash 5>&1 - Создаст дескриптор с 5 и перенатправит его в stdout
-echo netology > /proc/$$/fd/5 - выведет в дескриптор "5", который был пернеаправлен в stdout
+test -d /tmp/some_dir && echo Hi - в данном случае echo  отработает только при успешном заверщении команды test
+
+set -e - прерывает сессию при любом ненулевом значении исполняемых команд в конвеере кроме последней.
+в случае &&  вместе с set -e- вероятно не имеет смысла, так как при ошибке , выполнение команд прекратиться
+
 
 8.
-
-ls -l /root 9>&2 2>&1 1>&9 |grep denied -c
-1
-
+-e прерывает выполнение исполнения при ошибке любой команды кроме последней в последовательности 
+-x вывод трейса простых команд 
+-u неустановленные/не заданные параметры и переменные считаются как ошибки, с выводом в stderr текста ошибки и выполнит завершение неинтерактивного вызова
+-o pipefail возвращает код возврата набора/последовательности команд, ненулевой при последней команды или 0 для успешного выполнения команд.
 
 9.
-
-переменные окружения
-
-printenv
-env
-
-10.
-
-
-/proc/<PID>/cmdline - полный путь до исполняемого файла процесса [PID]
-/proc/<PID>/exe - содержит ссылку до файла запущенного для процесса [PID]
-
-11.
-
-SSE 4.2
-
-12.
-
-при подключении ожидается пользователь, а не другой процесс
-добавить -t - , команда исполняется c принудительным созданием псевдотерминала
-
-13.
-
-заначения  kernel.yama.ptrace_scope = 0
-
-14.
-
-tee делает вывод одновременно и в файл, указаный в качестве параметра, и в stdout
-команда получает вывод из stdin, перенаправленный через pipe от stdout команды echo
-так как команда запущена от sudo , то имеет права на запись в файл
+Самые частые (описание топроное, но по руссски :) ):
+S*(S,S+,Ss,Ssl,Ss+) - Процессы ожидающие завершения (спящие с прерыванием "сна")
+I*(I,I<) - фоновые(бездействующие) процессы ядра
+доп символы это доп характеристики, например приоритет.
