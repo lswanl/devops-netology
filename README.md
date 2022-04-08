@@ -1,15 +1,25 @@
 1.  Добавляю его в автозагрузку: sudo systemctl enable node_exporter
+[Unit]
+Description=Prometheus exporter for hardware and OS metrics
+Documentation=https://github.com/prometheus/node_exporter/blob/master/README.md
 
-systemctl status node_exporter
-● node_exporter.service - Prometheus exporter for hardware and OS metrics
-     Loaded: loaded (/etc/systemd/system/node_exporter.service; enabled; vendor preset: enabled)
-     Active: active (running) since Sat 2021-11-27 16:09:43 UTC; 21h ago
+[Service]
+EnvironmentFile=-/etc/skripts/node_exporter
+ExecStart=/bin/bash -c /home/vagrant/node_exporter-1.3.0.linux-amd64/node_exporter* $OPTIONS
+KillMode=process
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
+
+root@DonTtouch:/home/dlebedev/GIT/devops-netology# systemctl status node-exporter.service
+● node-exporter.service - Prometheus exporter for hardware and OS metrics
+     Loaded: loaded (/etc/systemd/system/node-exporter.service; enabled; vendor preset: enabled)
+     Active: activating (auto-restart) (Result: exit-code) since Fri 2022-04-08 06:26:27 MSK; 447ms ago
        Docs: https://github.com/prometheus/node_exporter/blob/master/README.md
-   Main PID: 1341 (node_exporter)
-      Tasks: 4 (limit: 1112)
-     Memory: 2.3M
-     CGroup: /system.slice/node_exporter.service
-             └─1341 /home/vagrant/node_exporter-1.3.0.linux-amd64/node_exporter
+    Process: 39955 ExecStart=/bin/bash -c /home/vagrant/node_exporter-1.3.0.linux-amd64/node_exporter* $OPTIONS (code=exited, status=127)
+   Main PID: 39955 (code=exited, status=127)
 
 2.
 process_cpu_seconds_total
