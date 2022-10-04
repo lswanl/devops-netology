@@ -283,3 +283,58 @@ total 8
 -rw-r--r-- 1 root root 13 Oct 3 15:19 readme.md
 
 -rw-r--r-- 1 root root 16 Oct 3 15:22 readme_host.md
+
+
+
+
+
+
+
+
+
+
+
+Правка задания 1.
+
+root@DonTtouch:~# cd Files/
+root@DonTtouch:~/Files# cat Dockerfile
+FROM nginx:latest
+RUN echo '<html><head>Hey, Netology</head><body><h1>I am DevOps Engineer!</h1></body></html>' > /usr/share/nginx/html/index.html
+RUN apt-get update
+RUN nginx -t
+root@DonTtouch:~/Files# docker build -t ldywa/nginx:1.1 .
+Sending build context to Docker daemon  2.048kB
+Step 1/3 : FROM nginx:latest
+ ---> 2d389e545974
+Step 2/3 : RUN apt-get update
+ ---> Using cache
+ ---> 73e09064a2cf
+Step 3/3 : RUN nginx -t
+ ---> Using cache
+ ---> 13628e40e5f9
+Successfully built 13628e40e5f9
+Successfully tagged ldywa/nginx:1.1
+root@DonTtouch:~/Files# curl -v http://localhost:8080
+*   Trying 127.0.0.1:8080...
+* TCP_NODELAY set
+* Connected to localhost (127.0.0.1) port 8080 (#0)
+> GET / HTTP/1.1
+> Host: localhost:8080
+> User-Agent: curl/7.68.0
+> Accept: */*
+> 
+* Mark bundle as not supporting multiuse
+< HTTP/1.1 200 OK
+< Server: nginx/1.23.1
+< Date: Tue, 04 Oct 2022 11:53:08 GMT
+< Content-Type: text/html
+< Content-Length: 83
+< Last-Modified: Mon, 03 Oct 2022 15:04:24 GMT
+< Connection: keep-alive
+< ETag: "633af9f8-53"
+< Accept-Ranges: bytes
+< 
+<html><head>Hey, Netology</head><body><h1>I am DevOps Engineer!</h1></body></html>
+* Connection #0 to host localhost left intact
+root@DonTtouch:~/Files# 
+
