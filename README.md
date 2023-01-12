@@ -1,344 +1,212 @@
 1.
 
-version: '3.6'
+root@dont-touch:/home/dlebedev/docker-compose# docker run --rm --name mysql-docker \
+>     -e MYSQL_DATABASE=test_db \
+>     -e MYSQL_ROOT_PASSWORD=123123 \
+>     -v $PWD/backup:/media/mysql/backup \
+>     -v my_data:/var/lib/mysql \
+>     -v $PWD/config/conf.d:/etc/mysql/conf.d \
+>     -p 3306:3306 \
+>     -d mysql:8.0
+Unable to find image 'mysql:8.0' locally
+8.0: Pulling from library/mysql
+0ed027b72ddc: Pull complete 
+0296159747f1: Pull complete 
+3d2f9b664bd3: Pull complete 
+df6519f81c26: Pull complete 
+36bb5e56d458: Pull complete 
+054e8fde88d0: Pull complete 
+f2b494c50c7f: Pull complete 
+132bc0d471b8: Pull complete 
+135ec7033a05: Pull complete 
+5961f0272472: Pull complete 
+75b5f7a3d3a4: Pull complete 
+Digest: sha256:3d7ae561cf6095f6aca8eb7830e1d14734227b1fb4748092f2be2cfbccf7d614
+Status: Downloaded newer image for mysql:8.0
+85df72116545f0301d2c46714d951aec2080d493ea51beda9dab46411fbde3d0
 
-volumes:
-  data: {}
-  backup: {}
+root@dont-touch:~# mkdir /home/dlebedev/sql
+root@dont-touch:~# cd /home/dlebedev/sql/
+root@dont-touch:/home/dlebedev/sql# wget https://github.com/netology-code/virt-homeworks/blob/virt-11/06-db-03-mysql/test_data/test_dump.sql
+--2023-01-12 13:37:18--  https://github.com/netology-code/virt-homeworks/blob/virt-11/06-db-03-mysql/test_data/test_dump.sql
+Resolving github.com (github.com)... 140.82.121.4
+Connecting to github.com (github.com)|140.82.121.4|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: unspecified [text/html]
+Saving to: ‘test_dump.sql’
 
-services:
+test_dump.sql                                          [ <=>                                                                                                             ] 165.99K  --.-KB/s    in 0.1s    
 
-  postgres:
-    image: postgres:12
-    container_name: psql
-    ports:
-      - "0.0.0.0:5432:5432"
-    volumes:
-      - data:/var/lib/postgresql/data
-      - backup:/media/postgresql/backup
-    environment:
-      POSTGRES_USER: "user"
-      POSTGRES_PASSWORD: "123123"
-      POSTGRES_DB: "db"
-    restart: always
+2023-01-12 13:37:18 (1.38 MB/s) - ‘test_dump.sql’ saved [169973]
 
-root@dont-touch:/home/dlebedev/docker-compose# docker-compose up -d
-Creating network "docker-compose_default" with the default driver
-Creating volume "docker-compose_data" with default driver
-Creating volume "docker-compose_backup" with default driver
-Pulling postgres (postgres:12)...
-12: Pulling from library/postgres
-8740c948ffd4: Pull complete
-c8dbd2beab50: Pull complete
-05d9dc9d0fbd: Pull complete
-ddd89d5ec714: Pull complete
-f98bb9f03867: Pull complete
-0554611e703f: Pull complete
-64e0a8694477: Pull complete
-8b868a753f47: Pull complete
-18bfbb5f850c: Pull complete
-5744def07d7d: Pull complete
-fe9fb494287c: Pull complete
-818b3a4590df: Pull complete
-a7343ebe57c4: Pull complete
-Digest: sha256:12c7030c6753e64f72601faa81c76a028ba6f0f5afb076ca6be2da57bc1eb93a
-Status: Downloaded newer image for postgres:12
-Creating psql ... done
+root@dont-touch:/home/dlebedev/sql# ls
+test_dump.sql
+root@dont-touch:/home/dlebedev/sql# 
 
-root@dont-touch:/home/dlebedev/docker-compose# docker exec -it psql bash
-root@2c6e4159f984:/# export PGPASSWORD=123123 && psql -h localhost -U user db
-psql (12.13 (Debian 12.13-1.pgdg110+1))
-Type "help" for help.
+root@dont-touch:/home/dlebedev/sql# docker cp /home/dlebedev/sql/test_dump.sql mysql-docker:/tmp
+root@dont-touch:/home/dlebedev/sql# docker ps
+CONTAINER ID   IMAGE         COMMAND                  CREATED          STATUS          PORTS                                                  NAMES
+85df72116545   mysql:8.0     "docker-entrypoint.s…"   29 minutes ago   Up 29 minutes   0.0.0.0:3306->3306/tcp, :::3306->3306/tcp, 33060/tcp   mysql-docker
+root@dont-touch:/home/dlebedev/sql# docker exec -it mysql-docker bash
+bash-4.4# mysql -u user -p test_db < /tmp/test_dump.sql
+Enter password: 
+bash-4.4# mysql -u root -p
+Enter password: 
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 10
+Server version: 8.0.31 MySQL Community Server - GPL
 
-db=# 
+Copyright (c) 2000, 2022, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> \q
+
+mysql> \s
+--------------
+mysql  Ver 8.0.31 for Linux on x86_64 (MySQL Community Server - GPL)
+
+Connection id:		11
+Current database:	
+Current user:		root@localhost
+SSL:			Not in use
+Current pager:		stdout
+Using outfile:		''
+Using delimiter:	;
+Server version:		8.0.31 MySQL Community Server - GPL
+Protocol version:	10
+Connection:		Localhost via UNIX socket
+Server characterset:	utf8mb4
+Db     characterset:	utf8mb4
+Client characterset:	latin1
+Conn.  characterset:	latin1
+UNIX socket:		/var/run/mysqld/mysqld.sock
+Binary data as:		Hexadecimal
+Uptime:			11 min 44 sec
+
+Threads: 2  Questions: 7  Slow queries: 0  Opens: 119  Flush tables: 3  Open tables: 38  Queries per second avg: 0.009
+--------------
+
+
+mysql> USE test_db;
+Database changed
+mysql> 
+
+mysql> SELECT COUNT(*) FROM orders WHERE price > 300;
++----------+
+| COUNT(*) |
++----------+
+|        1 |
++----------+
+1 row in set (0.00 sec)
+
 
 
 2.
 
-db=# CREATE USER "test-admin-user";
-CREATE ROLE
-db=# CREATE DATABASE test_db;
-CREATE DATABASE
-db=# CREATE TABLE orders (
-db(#     id SERIAL,
-    наименование VARCHAR, 
-    цена INTEGER,
-    PRIMARY KEY (id)
-);
-CREATE TABLE  
-test_db=# CREATE TABLE clients (
-    id SERIAL,
-    фамилия VARCHAR,
-    "страна проживания" VARCHAR, 
-    заказ INTEGER,
-    PRIMARY KEY (id),
-    CONSTRAINT fk_заказ
-      FOREIGN KEY(заказ) 
-            REFERENCES orders(id)
-);
-CREATE TABLE
 
-db-# \q
-root@2c6e4159f984:/# export PGPASSWORD=123123 && psql -h localhost -U user test_db
-psql (12.13 (Debian 12.13-1.pgdg110+1))
-Type "help" for help.
-
-test_db=# CREATE TABLE orders (
-    id SERIAL,
-    наименование VARCHAR, 
-    цена INTEGER,
-    PRIMARY KEY (id)
-);
-CREATE TABLE
-
-test_db=# CREATE TABLE clients (
-    id SERIAL,
-    фамилия VARCHAR,
-    "страна проживания" VARCHAR, 
-    заказ INTEGER,
-    PRIMARY KEY (id),
-    CONSTRAINT fk_заказ
-      FOREIGN KEY(заказ) 
-            REFERENCES orders(id)
-);
-CREATE TABLE
-
-test_db=# CREATE INDEX ON clients("страна проживания");
-CREATE INDEX
-test_db=# GRANT ALL ON TABLE orders, clients TO "test-admin-user";
-GRANT
-test_db=# CREATE USER "test-simple-user" WITH PASSWORD 'netology';
-CREATE ROLE
-test_db=# GRANT CONNECT ON DATABASE test_db TO "test-simple-user";
-GRANT
-test_db=# GRANT USAGE ON SCHEMA public TO "test-simple-user";
-GRANT
-test_db=# GRANT SELECT, INSERT, UPDATE, DELETE ON orders, clients TO "test-simple-user";
-GRANT
-
-		
-
-		Список БД
-test_db=# \l+
-                                                                   List of databases
-   Name    | Owner | Encoding |  Collate   |   Ctype    |     Access privileges     |  Size   | Tablespace |                Description                 
------------+-------+----------+------------+------------+---------------------------+---------+------------+--------------------------------------------
- db        | user  | UTF8     | en_US.utf8 | en_US.utf8 |                           | 8049 kB | pg_default | 
- postgres  | user  | UTF8     | en_US.utf8 | en_US.utf8 |                           | 7969 kB | pg_default | default administrative connection database
- template0 | user  | UTF8     | en_US.utf8 | en_US.utf8 | =c/user                  +| 7825 kB | pg_default | unmodifiable empty database
-           |       |          |            |            | user=CTc/user             |         |            | 
- template1 | user  | UTF8     | en_US.utf8 | en_US.utf8 | =c/user                  +| 7825 kB | pg_default | default template for new databases
-           |       |          |            |            | user=CTc/user             |         |            | 
- test_db   | user  | UTF8     | en_US.utf8 | en_US.utf8 | =Tc/user                 +| 8121 kB | pg_default | 
-           |       |          |            |            | user=CTc/user            +|         |            | 
-           |       |          |            |            | "test-simple-user"=c/user |         |            | 
-(5 rows)
+mysql> CREATE USER 'test'@'localhost' 
+    ->     IDENTIFIED WITH mysql_native_password BY 'test-pass'
+    ->     WITH MAX_CONNECTIONS_PER_HOUR 100
+    ->     PASSWORD EXPIRE INTERVAL 180 DAY
+    ->     FAILED_LOGIN_ATTEMPTS 3 PASSWORD_LOCK_TIME 2
+    ->     ATTRIBUTE '{"first_name":"James", "last_name":"Pretty"}';
+Query OK, 0 rows affected (0.01 sec)
 
 
-		Список таблиц
+mysql> GRANT SELECT ON test_db.* TO test@localhost;
+Query OK, 0 rows affected, 1 warning (0.00 sec)
 
-test_db=#  \d+ clients
-                                                           Table "public.clients"
-      Column       |       Type        | Collation | Nullable |               Default               | Storage  | Stats target | Description 
--------------------+-------------------+-----------+----------+-------------------------------------+----------+--------------+-------------
- id                | integer           |           | not null | nextval('clients_id_seq'::regclass) | plain    |              | 
- фамилия           | character varying |           |          |                                     | extended |              | 
- страна проживания | character varying |           |          |                                     | extended |              | 
- заказ             | integer           |           |          |                                     | plain    |              | 
-Indexes:
-    "clients_pkey" PRIMARY KEY, btree (id)
-    "clients_страна проживания_idx" btree ("страна проживания")
-Foreign-key constraints:
-    "fk_заказ" FOREIGN KEY ("заказ") REFERENCES orders(id)
-Access method: heap
-
-
-test_db=# \d+ orders
-                                                        Table "public.orders"
-    Column    |       Type        | Collation | Nullable |              Default               | Storage  | Stats target | Description 
---------------+-------------------+-----------+----------+------------------------------------+----------+--------------+-------------
- id           | integer           |           | not null | nextval('orders_id_seq'::regclass) | plain    |              | 
- наименование | character varying |           |          |                                    | extended |              | 
- цена         | integer           |           |          |                                    | plain    |              | 
-Indexes:
-    "orders_pkey" PRIMARY KEY, btree (id)
-Referenced by:
-    TABLE "clients" CONSTRAINT "fk_заказ" FOREIGN KEY ("заказ") REFERENCES orders(id)
-Access method: heap
+mysql> SELECT * FROM INFORMATION_SCHEMA.USER_ATTRIBUTES WHERE USER = 'test';
++------+-----------+------------------------------------------------+
+| USER | HOST      | ATTRIBUTE                                      |
++------+-----------+------------------------------------------------+
+| test | localhost | {"last_name": "Pretty", "first_name": "James"} |
++------+-----------+------------------------------------------------+
+1 row in set (0.00 sec)
 
 
 
-
-		Запрос списка пользователей 
-
-test_db=# SELECT 
-    grantee, table_name, privilege_type 
-FROM 
-    information_schema.table_privileges 
-WHERE 
-    grantee in ('test-admin-user','test-simple-user')
-    and table_name in ('clients','orders')
-order by 
-    1,2,3;
-     grantee      | table_name | privilege_type 
-------------------+------------+----------------
- test-admin-user  | clients    | DELETE
- test-admin-user  | clients    | INSERT
- test-admin-user  | clients    | REFERENCES
- test-admin-user  | clients    | SELECT
- test-admin-user  | clients    | TRIGGER
- test-admin-user  | clients    | TRUNCATE
- test-admin-user  | clients    | UPDATE
- test-admin-user  | orders     | DELETE
- test-admin-user  | orders     | INSERT
- test-admin-user  | orders     | REFERENCES
- test-admin-user  | orders     | SELECT
- test-admin-user  | orders     | TRIGGER
- test-admin-user  | orders     | TRUNCATE
- test-admin-user  | orders     | UPDATE
- test-simple-user | clients    | DELETE
- test-simple-user | clients    | INSERT
- test-simple-user | clients    | SELECT
- test-simple-user | clients    | UPDATE
- test-simple-user | orders     | DELETE
- test-simple-user | orders     | INSERT
- test-simple-user | orders     | SELECT
- test-simple-user | orders     | UPDATE
-(22 rows)
+mysql> SELECT table_schema,table_name,engine FROM information_schema.tables WHERE table_schema = DATABASE();
++--------------+------------+--------+
+| TABLE_SCHEMA | TABLE_NAME | ENGINE |
++--------------+------------+--------+
+| test_db      | orders     | InnoDB |
++--------------+------------+--------+
+1 row in set (0.00 sec)
 
 
+mysql> SET profiling = 1;
 
-3.
+mysql> ALTER TABLE orders ENGINE = MyISAM;
+Query OK, 5 rows affected (0.05 sec)
+Records: 5  Duplicates: 0  Warnings: 0
 
-test_db=# INSERT INTO orders VALUES (1, 'Шоколад', 10), (2, 'Принтер', 3000), (3, 'Книга', 500), (4, 'Монитор', 7000), (5, 'Гитара', 4000);
-INSERT 0 5
+mysql> ALTER TABLE orders ENGINE = InnoDB;
+Query OK, 5 rows affected (0.05 sec)
+Records: 5  Duplicates: 0  Warnings: 0
 
-test_db=# SELECT * FROM orders;
- id | наименование | цена 
-----+--------------+------
-  1 | Шоколад      |   10
-  2 | Принтер      | 3000
-  3 | Книга        |  500
-  4 | Монитор      | 7000
-  5 | Гитара       | 4000
-(5 rows)
-
-test_db=# SELECT count(1) FROM orders;
- count 
--------
-     5
-(1 row)
+mysql> SHOW PROFILES;
++----------+------------+------------------------------------+
+| Query_ID | Duration   | Query                              |
++----------+------------+------------------------------------+
+|        1 | 0.00347100 | SET profiling = 1                  |
+|        2 | 0.04049716 | ALTER TABLE orders ENGINE = MyISAM |
+|        3 | 0.06030421 | ALTER TABLE orders ENGINE = InnoDB |
++----------+------------+------------------------------------+
+3 rows in set, 1 warning (0.00 sec)
 
 
-test_db=# INSERT INTO clients VALUES (1, 'Иванов Иван Иванович', 'USA'), (2, 'Петров Петр Петрович', 'Canada'), (3, 'Иоганн Себастьян Бах', 'Japan'), (4, 'Ронни Джеймс Дио', 'Russia'), (5, 'Ritchie Blackmore', 'Russia');
-INSERT 0 5
-
-test_db=# SELECT * FROM clients;
- id |       фамилия        | страна проживания | заказ 
-----+----------------------+-------------------+-------
-  1 | Иванов Иван Иванович | USA               |      
-  2 | Петров Петр Петрович | Canada            |      
-  3 | Иоганн Себастьян Бах | Japan             |      
-  4 | Ронни Джеймс Дио     | Russia            |      
-  5 | Ritchie Blackmore    | Russia            |      
-(5 rows)
-
-test_db=# SELECT count(1) FROM clients;
- count 
--------
-     5
-(1 row)
-
-test_db=# 
 
 
 4.
 
-test_db=# UPDATE clients SET "заказ" = (SELECT id FROM orders WHERE "наименование"='Книга') WHERE "фамилия"='Иванов Иван Иванович';
-UPDATE 1
-test_db=# UPDATE clients SET "заказ" = (SELECT id FROM orders WHERE "наименование"='Монитор') WHERE "фамилия"='Петров Петр Петрович';
-UPDATE 1
-test_db=# UPDATE clients SET "заказ" = (SELECT id FROM orders WHERE "наименование"='Гитара') WHERE "фамилия"='Иоганн Себастьян Бах';
-UPDATE 1
-
-test_db=# SELECT c.* FROM clients c JOIN orders o ON c.заказ = o.id;
- id |       фамилия        | страна проживания | заказ 
-----+----------------------+-------------------+-------
-  1 | Иванов Иван Иванович | USA               |     3
-  2 | Петров Петр Петрович | Canada            |     4
-  3 | Иоганн Себастьян Бах | Japan             |     5
-(3 rows)
 
 
-5.
+bash-4.4# cat /etc/my.cnf
+# For advice on how to change settings please see
+# http://dev.mysql.com/doc/refman/8.0/en/server-configuration-defaults.html
 
-test_db=# SELECT c.* FROM clients c JOIN orders o ON c.заказ = o.id;
- id |       фамилия        | страна проживания | заказ 
-----+----------------------+-------------------+-------
-  1 | Иванов Иван Иванович | USA               |     3
-  2 | Петров Петр Петрович | Canada            |     4
-  3 | Иоганн Себастьян Бах | Japan             |     5
-(3 rows)
+[mysqld]
+#
+# Remove leading # and set to the amount of RAM for the most important data
+# cache in MySQL. Start at 70% of total RAM for dedicated server, else 10%.
+# innodb_buffer_pool_size = 128M
+#
+# Remove leading # to turn on a very important data integrity option: logging
+# changes to the binary log between backups.
+# log_bin
+#
+# Remove leading # to set options mainly useful for reporting servers.
+# The server defaults are faster for transactions and fast SELECTs.
+# Adjust sizes as needed, experiment to find the optimal values.
+# join_buffer_size = 128M
+# sort_buffer_size = 2M
+# read_rnd_buffer_size = 2M
 
-test_db=# EXPLAIN SELECT c.* FROM clients c JOIN orders o ON c.заказ = o.id;
-                               QUERY PLAN                               
-------------------------------------------------------------------------
- Hash Join  (cost=37.00..57.24 rows=810 width=72)
-   Hash Cond: (c."заказ" = o.id)
-   ->  Seq Scan on clients c  (cost=0.00..18.10 rows=810 width=72)
-   ->  Hash  (cost=22.00..22.00 rows=1200 width=4)
-         ->  Seq Scan on orders o  (cost=0.00..22.00 rows=1200 width=4)
-(5 rows)
+# Remove leading # to revert to previous value for default_authentication_plugin,
+# this will increase compatibility with older clients. For background, see:
+# https://dev.mysql.com/doc/refman/8.0/en/server-system-variables.html#sysvar_default_authentication_plugin
+# default-authentication-plugin=mysql_native_password
+skip-host-cache
+skip-name-resolve
+datadir=/var/lib/mysql
+socket=/var/run/mysqld/mysqld.sock
+secure-file-priv=/var/lib/mysql-files
+user=mysql
 
+pid-file=/var/run/mysqld/mysqld.pid
 
+# Custom config should go here
+!includedir /etc/mysql/conf.d/
 
-1. Построчно прочитана таблица orders
-2. Создан кеш по полю id для таблицы orders
-3. Прочитана таблица clients
-4. Для каждой строки по полю "заказ" будет проверено, соответствует ли она чему-то в кеше orders
-- если соответствия нет - строка будет пропущена
-- если соответствие есть, то на основе этой строки и всех подходящих строках кеша СУБД сформирует вывод
-
-При запуске просто explain, Postgres напишет только примерный план выполнения запроса и для каждой операции предположит:
-- сколько процессорного времени уйдёт на поиск первой записи и сбор всей выборки: cost=первая_запись..вся_выборка
-- сколько примерно будет строк: rows
-- какой будет средняя длина строки в байтах: width
-Postgres делает предположения на основе статистики, которую собирает периодический выполня analyze запросы на выборку данных из служебных таблиц.
-Если запустить explain analyze, то запрос будет выполнен и к плану добавятся уже точные данные по времени и объёму данных.
-explain verbose и explain analyze verbose - для каждой операции выборки будут написаны поля таблиц, которые в выборку попали.
-
-
-
-6.
-
-
-root@2c6e4159f984:/# export PGPASSWORD=123123 && pg_dumpall -h localhost -U user > /media/postgresql/backup/test_db.sql
-root@2c6e4159f984:/# ls /media/postgresql/backup/
-test_db.sql
-root@2c6e4159f984:/# exit
-exit
-
-root@dont-touch:/home/dlebedev/docker-compose# docker-compose stop
-Stopping psql ... done
-
-root@dont-touch:/home/dlebedev/docker-compose# docker ps -a
-CONTAINER ID   IMAGE         COMMAND                  CREATED          STATUS                      PORTS     NAMES
-2c6e4159f984   postgres:12   "docker-entrypoint.s…"   33 minutes ago   Exited (0) 23 seconds ago             psql
-
-
-root@dont-touch:/home/dlebedev/docker-compose# docker run --rm -d -e POSTGRES_USER=user -e POSTGRES_PASSWORD=123123 -e POSTGRES_DB=test_db -v dont-touch:/media/postgresql/backup --name psql2 postgres:12
-0d78d02f0eff85876e03030a6d2f8c5bfcfeeac756a559e3c21400910609435c
-root@dont-touch:/home/dlebedev/docker-compose# docker ps -a
-CONTAINER ID   IMAGE         COMMAND                  CREATED          STATUS                     PORTS      NAMES
-0d78d02f0eff   postgres:12   "docker-entrypoint.s…"   40 seconds ago   Up 39 seconds              5432/tcp   psql2
-2c6e4159f984   postgres:12   "docker-entrypoint.s…"   36 minutes ago   Exited (0) 3 minutes ago              psql
-
-root@dont-touch:/home/dlebedev/docker-compose# docker exec -it psql2  bash
-root@0d78d02f0eff:ls /media/postgresql/backup/
-test_db.sql
-root@0d78d02f0eff:/# export PGPASSWORD=123123 && psql -h localhost -U user -f /media/postgresql/backup/test_db.sql test_db
-root@0d78d02f0eff:/# psql -h localhost -U user test_db
-psql (12.10 (Debian 12.10-1.pgdg110+1))
-Type "help" for help.
-
-test_db=#
+innodb_flush_log_at_trx_commit = 0
+innodb_file_per_table = ON
+innodb_log_buffer_size = 1M
+innodb_buffer_pool_size = 2G
+innodb_log_file_size = 100M
+bash-4.4#
