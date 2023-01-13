@@ -751,7 +751,7 @@ CREATE RULE orders_insert_to_less AS ON INSERT TO orders WHERE ( price <= 499 ) 
 
 
 
-export PGPASSWORD=netology && pg_dump -h localhost -U postgres test_database > /tmp/test_database_backup.sql
+export PGPASSWORD=123 && pg_dump -h localhost -U postgres test_database > /tmp/test_database_backup.sql
 
 
 
