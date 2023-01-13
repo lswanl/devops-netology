@@ -1,0 +1,32 @@
+1.
+
+
+root@dont-touch:/home/dlebedev/docker-compose# docker run --rm --name postgresql-docker \
+> -e POSTGRES_PASSWORD=123123 \
+> -v my_data:/var/lib/postgresql/data \
+> -p 5432:5432 \
+> -d postgres:13
+Unable to find image 'postgres:13' locally
+13: Pulling from library/postgres
+8740c948ffd4: Pull complete 
+c8dbd2beab50: Pull complete 
+05d9dc9d0fbd: Pull complete 
+ddd89d5ec714: Pull complete 
+f98bb9f03867: Pull complete 
+0554611e703f: Pull complete 
+64e0a8694477: Pull complete 
+8b868a753f47: Pull complete 
+29acea527529: Pull complete 
+04331b81a289: Pull complete 
+faa16d756995: Pull complete 
+8992a861a703: Pull complete 
+3a0e6483774c: Pull complete 
+Digest: sha256:1c36dd0c70477d7f7e472df3cddcdcc1c95526e74ca02b75e4a2c2c4ebd2f1db
+Status: Downloaded newer image for postgres:13
+f05f4e3769b4657be07caafc2c7137a809e07c87d025894728ff0f8f25d428ea
+root@dont-touch:/home/dlebedev/docker-compose# docker ps
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+root@dont-touch:/home/dlebedev/docker-compose# docker images -a
+REPOSITORY   TAG       IMAGE ID       CREATED        SIZE
+postgres     13        beb2ef252f25   35 hours ago   373MB
+
