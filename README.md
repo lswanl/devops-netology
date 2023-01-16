@@ -254,16 +254,32 @@ pg_catalog | pg_views                        | view  | postgres | permanent   | 
 postgres=# \q
 
 root@319b5a711dc3:/# 
+```
+
+
+
+## Задача 2
+
+Используя `psql` создайте БД `test_database`.
+
+Изучите [бэкап БД](https://github.com/netology-code/virt-homeworks/tree/virt-11/06-db-04-postgresql/test_data).
+
+Восстановите бэкап БД в `test_database`.
+
+Перейдите в управляющую консоль `psql` внутри контейнера.
+
+Подключитесь к восстановленной БД и проведите операцию ANALYZE для сбора статистики по таблице.
+
+Используя таблицу [pg_stats](https://postgrespro.ru/docs/postgresql/12/view-pg-stats), найдите столбец таблицы `orders` 
+с наибольшим средним значением размера элементов в байтах.
+
+**Приведите в ответе** команду, которую вы использовали для вычисления и полученный результат.
 
 
 
 
-2.
 
-
-
-
-
+```
 postgres=# CREATE DATABASE test_database;
 CREATE DATABASE
 
@@ -341,17 +357,25 @@ avg_width
 16
 4
 (3 rows)
+```
 
 
 
 
+## Задача 3
 
-3.
+Архитектор и администратор БД выяснили, что ваша таблица orders разрослась до невиданных размеров и
+поиск по ней занимает долгое время. Вам, как успешному выпускнику курсов DevOps в нетологии предложили
+провести разбиение таблицы на 2 (шардировать на orders_1 - price>499 и orders_2 - price<=499).
+
+Предложите SQL-транзакцию для проведения данной операции.
+
+Можно ли было изначально исключить "ручное" разбиение при проектировании таблицы orders?
 
 
 
 
-
+```
 test_database=# CREATE TABLE orders_more_499_price (CHECK (price > 499)) INHERITS (orders);
 CREATE TABLE
 test_database=# INSERT INTO orders_more_499_price SELECT * FROM orders WHERE price > 499;
@@ -374,12 +398,17 @@ public | orders_more_499_price | table | postgres
 
 CREATE RULE orders_insert_to_more AS ON INSERT TO orders WHERE ( price > 499 ) DO INSTEAD INSERT INTO orders_more_499_price VALUES (NEW.*);
 CREATE RULE orders_insert_to_less AS ON INSERT TO orders WHERE ( price <= 499 ) DO INSTEAD INSERT INTO orders_less_499_price VALUES (NEW.*);
+```
 
 
+## Задача 4
 
-4.
+Используя утилиту `pg_dump` создайте бекап БД `test_database`.
+
+Как бы вы доработали бэкап-файл, чтобы добавить уникальность значения столбца `title` для таблиц `test_database`?
 
 
+```
 
 export PGPASSWORD=123 && pg_dump -h localhost -U postgres test_database > /tmp/test_database_backup.sql
 
