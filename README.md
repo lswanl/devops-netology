@@ -1,4 +1,4 @@
-'''
+```
 1.
 
 root@dont-touch:/home/dlebedev/docker-compose# docker ps
@@ -382,4 +382,4 @@ CREATE RULE orders_insert_to_less AS ON INSERT TO orders WHERE ( price <= 499 ) 
 export PGPASSWORD=123 && pg_dump -h localhost -U postgres test_database > /tmp/test_database_backup.sql
 
 title character varying(80) NOT NULL UNIQUE,
-'''
+```
