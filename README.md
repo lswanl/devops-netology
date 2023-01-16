@@ -1,6 +1,8 @@
-```
-1.
 
+## Домашнее задание к занятию "6.4. PostgreSQL"
+
+#### Задача 1
+```
 root@dont-touch:/home/dlebedev/docker-compose# docker ps
 CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
 root@dont-touch:/home/dlebedev/docker-compose# docker run --rm -d --name=postgres-docker -e POSTGRES_PASSWORD=123 postgres:13
