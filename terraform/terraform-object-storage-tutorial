@@ -1,0 +1,26 @@
+terraform {
+  required_providers {
+    yandex = {
+      source = "yandex-cloud/yandex"
+    }
+  }
+
+  backend "s3" {
+    endpoint   = "storage.yandexcloud.net"
+    bucket     = "test_backet"
+    region     = "ru-central1"
+    key        = "/root/git/devops-netology/terraform/backet.tfstate"
+    access_key = "YCAJEEjp_hLMsxQcV6glNUwXx"
+    secret_key = "YCNX4RtktySOfnCYflmkhhOu4OtTh2VjMdIqc6o0"
+
+    skip_region_validation      = true
+    skip_credentials_validation = true
+  }
+}
+
+provider "yandex" {
+  token     = "y0_AgAAAAACvsYNAATuwQAAAADQh5z3BfWTlf-ZSCKSjbR_vmRpu_eank8"
+  cloud_id  = "aje83jvk688ffdh5v8ib"
+  folder_id = "b1gli65bh12fvc62rh0k"
+  zone      = "ru-central1-a"
+}

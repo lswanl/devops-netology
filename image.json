@@ -1,0 +1,31 @@
+{
+  "builders": [
+    {
+      "type":      "yandex",
+      "token":     "y0_AgAAAAACvsYNAATuwQAAAADQh5z3BfWTlf-ZSCKSjbR_vmRpu_eank8",
+      "folder_id": "b1gli65bh12fvc62rh0k",
+      "zone":      "ru-central1-a",
+
+      "image_name":        "centos-7-base",
+      "image_family":      "centos",
+      "image_description": "by packer",
+
+      "source_image_family": "centos-7",
+      "subnet_id":           "e9b8k5c6lh05h2u8r93h",
+      "use_ipv4_nat":        true,
+      "disk_type":           "network-ssd",
+      "ssh_username":        "centos"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline": [
+        "sudo yum update -y",
+        "sudo yum install -y bridge-utils bind-utils iptables curl telnet openssh",
+        "sudo su -"
+      ]
+    }
+  ]
+}
+
